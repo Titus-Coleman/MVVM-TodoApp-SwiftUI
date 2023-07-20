@@ -9,18 +9,24 @@ import SwiftUI
 
 struct ListView: View {
     
-    @State var items: [String] = [
-        "Example todo",
-        "Take out trash",
-        "Study Java"
-    ]
+    @EnvironmentObject var listViewModel: ListViewModel
+    
+
     
     var body: some View {
         List {
-            ForEach(items, id: \.self) {
+            ForEach(listViewModel.items) {
                 item in
-                ListRowView(title: item)
-            }
+                ListRowView(item: item)
+                    .onTapGesture {
+                        withAnimation(.linear){
+                            listViewModel.completedItem(item: item)
+                            
+                        }
+                    }
+                }
+            .onDelete(perform: listViewModel.deleteItem)
+            .onMove(perform: listViewModel.moveItem)
             
         }
         .listStyle(SidebarListStyle())
@@ -36,6 +42,8 @@ struct ListView: View {
             }
         }
     }
+
+    
 }
 
 struct ListView_Previews: PreviewProvider {
@@ -43,6 +51,7 @@ struct ListView_Previews: PreviewProvider {
         NavigationStack{
             ListView()
         }
+        .environmentObject(ListViewModel())
     }
 }
 
